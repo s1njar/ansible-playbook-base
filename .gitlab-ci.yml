@@ -1,0 +1,19 @@
+image: registry.gitlab.com/arsenios/devops/docker-images/ansible:latest
+
+stages:
+  - deploy
+
+before_script:
+  - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+  - eval $(ssh-agent -s)
+  - ssh-add <(echo "$SSH_PRIVATE_KEY" | base64 -d)
+  - mkdir -p ~/.ssh
+  - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
+  - git submodule update --init
+  - chmod -v 700 $(pwd)
+
+production:
+  stage: deploy
+  when: manual
+  script:
+    - ansible-playbook playbook.yml -i env/prod/inventory.yml

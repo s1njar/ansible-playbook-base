@@ -1,0 +1,6 @@
+---
+- name: Server
+  hosts: all
+  become: yes
+  roles:
+    - { role: my.role }
